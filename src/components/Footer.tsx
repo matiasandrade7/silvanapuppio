@@ -24,19 +24,18 @@ export default function Footer() {
       </div>
       <div className="footer__bottom">
         <span>
-          © {new Date().getFullYear()} {SITE.name} · {SITE.role}
+          © {new Date().getFullYear()} {SITE.name} · {SITE.role} · {SITE.location}
         </span>
         <a
           className="footer__credit"
-          href="https://sevenflow.uy"
+          href="https://happypath.uy"
           target="_blank"
           rel="noreferrer"
+          aria-label="Creado por Happy Path"
         >
+          <span>Creado por</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/img/seven-flow.png" alt="" width={26} height={23} />
-          <span>
-            Creado por <strong>Seven Flow</strong>
-          </span>
+          <img src="/img/happy-path.svg" alt="" width={116} height={23} />
         </a>
       </div>
     </footer>

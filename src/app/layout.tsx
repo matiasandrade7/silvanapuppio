@@ -17,7 +17,7 @@ const body = Figtree({
 });
 
 const DESCRIPTION =
-  "Silvana Puppio, técnica en belleza. Manos y pies, rostro, cejas y pestañas con dedicación y detalle. Reservá tu turno por WhatsApp.";
+  "Silvana Puppio, técnica en belleza y balayage. Manicuría, pedicuría, depilación, peluquería, alisados y peinado y maquillaje para novias y quinceañeras con atención personalizada, zona Nuevocentro Shopping. Reservá tu turno por WhatsApp.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),

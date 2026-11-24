@@ -1,12 +1,16 @@
+import BigMarquee from "@/components/BigMarquee";
 import Footer from "@/components/Footer";
+import GiftCard from "@/components/GiftCard";
 import Header from "@/components/Header";
+import { PinIcon } from "@/components/Icons";
 import Photo from "@/components/Photo";
 import Reveal from "@/components/Reveal";
 import ScrollTop from "@/components/ScrollTop";
+import ServiceArt from "@/components/ServiceArt";
+import ServicesShowcase from "@/components/ServicesShowcase";
 import Testimonials from "@/components/Testimonials";
-import { CARDS, PHOTOS, SERVICES, SITE, WORKS, whatsappLink } from "@/lib/site";
-
-const MARQUEE = ["Realzá tu belleza", "Cuidate con tiempo", "Tu momento"];
+import Tilt from "@/components/Tilt";
+import { CARDS, HOURS, PAYMENTS, PHOTOS, SITE, WORKS, whatsappLink } from "@/lib/site";
 
 export default function Home() {
   return (
@@ -29,8 +33,8 @@ export default function Home() {
             </h1>
             <p className="hero__role">Técnica en belleza</p>
             <p className="hero__text">
-              Cuidado personal con dedicación y detalle: manos, pies, rostro, cejas y pestañas. Un
-              momento para vos, en un espacio pensado para que te sientas cómoda.
+              Manos, pies, cabello, depilación y maquillaje con la atención personalizada que necesitás.
+              Reservá tu turno con agenda previa.
             </p>
             <div className="hero__actions">
               <a href="#servicios" className="btn btn--pink">
@@ -49,12 +53,17 @@ export default function Home() {
             <Reveal className="about__copy">
               <h2 className="display display--pink">Sobre mí</h2>
               <p>
-                Soy Silvana, técnica en belleza. Me dedico a que cada clienta salga del turno
-                sintiéndose bien con su imagen y con su piel.
+                Soy Silvana, técnica en belleza y especialista en balayage. Me dedico a que cada
+                clienta salga del turno sintiéndose bien con su imagen.
               </p>
               <p>
-                Trabajo con productos de calidad, materiales siempre limpios y mucho cuidado en los
-                detalles. Cada servicio lo adapto a lo que necesitás y a lo que te queda bien.
+                Trabajo con agenda previa para darle a cada persona el tiempo y la atención
+                personalizada que merece. Cada servicio lo adapto a lo que necesitás y a lo que te
+                queda bien.
+              </p>
+              <p>
+                También me encargo del peinado en las noticias de Canal 5, así que sé lo que es
+                trabajar con detalle y a horario.
               </p>
               <p>
                 Si no sabés por dónde empezar, escribime y lo vemos juntas.
@@ -69,22 +78,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* MARQUEE */}
-        <div className="marquee" aria-hidden="true">
-          <div className="marquee__track">
-            {Array.from({ length: 2 }).map((_, group) => (
-              <div className="marquee__group" key={group}>
-                {Array.from({ length: 4 }).flatMap((_, rep) =>
-                  MARQUEE.map((text) => (
-                    <span key={`${rep}-${text}`}>
-                      {text} <i>/</i>
-                    </span>
-                  )),
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* MARQUESINA (se mueve con el scroll) */}
+        <BigMarquee />
 
         {/* SERVICIOS (tarjetas) */}
         <section id="servicios" className="explore">
@@ -100,12 +95,14 @@ export default function Home() {
           <div className="cards">
             {CARDS.map((card, i) => (
               <Reveal key={card.id} delay={i * 120}>
-                <a href="#detalle" className="card">
-                  <div className="card__img">
-                    <Photo src={card.photo} alt={card.label} tone={i === 1 ? "deep" : "soft"} />
-                  </div>
-                  <span className="card__label">{card.label}</span>
-                </a>
+                <Tilt>
+                  <a href="#detalle" className="card">
+                    <div className="card__img">
+                      <ServiceArt art={card.art} photo={card.photo} pos="50% 30%" alt={card.label} />
+                    </div>
+                    <span className="card__label">{card.label}</span>
+                  </a>
+                </Tilt>
               </Reveal>
             ))}
           </div>
@@ -116,29 +113,17 @@ export default function Home() {
           <div className="detail__inner">
             <Reveal className="detail__head">
               <h2 className="display display--pink">Lo que hago</h2>
-              <p>
-                Escribime por WhatsApp para consultar precios, disponibilidad y combinar el servicio
-                que mejor se adapte a vos.
-              </p>
-              <a href={whatsappLink()} className="btn btn--pink" target="_blank" rel="noreferrer">
-                Reservar turno
-              </a>
+              <div className="detail__intro">
+                <p>
+                  Trabajo sola, por eso atiendo con agenda previa. Si querés un horario específico,
+                  agendá con tiempo. Escribime por WhatsApp para consultar precios y disponibilidad.
+                </p>
+                <a href={whatsappLink()} className="btn btn--pink" target="_blank" rel="noreferrer">
+                  Reservar turno
+                </a>
+              </div>
             </Reveal>
-            <ol className="detail__list">
-              {SERVICES.map((s, i) => (
-                <li key={s.title}>
-                  <Reveal delay={i * 60}>
-                    <div className="detail__row">
-                      <span className="detail__num">{String(i + 1).padStart(2, "0")}</span>
-                      <div>
-                        <h3>{s.title}</h3>
-                        <p>{s.text}</p>
-                      </div>
-                    </div>
-                  </Reveal>
-                </li>
-              ))}
-            </ol>
+            <ServicesShowcase />
           </div>
         </section>
 
@@ -187,11 +172,16 @@ export default function Home() {
           </div>
         </section>
 
+        {/* GIFT CARD */}
+        <section id="gift-card" className="gift">
+          <div className="gift__inner">
+            <GiftCard />
+          </div>
+        </section>
+
         {/* OPINIONES */}
         <section id="opiniones" className="opinions">
-          <Reveal>
-            <Testimonials />
-          </Reveal>
+          <Testimonials />
         </section>
 
         {/* CONTACTO */}
@@ -203,8 +193,23 @@ export default function Home() {
             <Reveal className="cta__card" delay={120}>
               <h2 className="display display--pink">¿Lista para tu momento?</h2>
               <p>
-                Reservá tu turno por WhatsApp. Te respondo para coordinar día y horario, y para
-                contarte todo lo que necesites antes de venir.
+                Trabajo sola, así que si querés un horario específico, agendá con tiempo. Escribime
+                por WhatsApp, coordinamos día y horario, y te cuento todo lo que necesites antes de
+                venir.
+              </p>
+              <p className="cta__place">
+                <PinIcon size={16} /> {SITE.address}
+              </p>
+              <dl className="cta__hours">
+                {HOURS.map((h) => (
+                  <div key={h.days}>
+                    <dt>{h.days}</dt>
+                    <dd>{h.time}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="cta__pay">
+                <strong>Medios de pago:</strong> {PAYMENTS.join(" · ")}
               </p>
               <a href={whatsappLink()} className="btn btn--pink" target="_blank" rel="noreferrer">
                 Reservar por WhatsApp

@@ -32,6 +32,14 @@ export function WhatsappIcon({ size = 16 }: IconProps) {
   );
 }
 
+export function PinIcon({ size = 16 }: IconProps) {
+  return (
+    <svg {...base(size)}>
+      <path d="M12 2a7 7 0 0 0-7 7c0 4.9 6.1 12.2 6.4 12.5a.8.8 0 0 0 1.2 0C12.9 21.2 19 13.9 19 9a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
+    </svg>
+  );
+}
+
 export function StarIcon({ size = 16 }: IconProps) {
   return (
     <svg {...base(size)}>
