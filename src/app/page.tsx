@@ -112,7 +112,7 @@ export default function Home() {
         <section id="detalle" className="detail">
           <div className="detail__inner">
             <Reveal className="detail__head">
-              <h2 className="display display--pink">Lo que hago</h2>
+              <h2 className="display display--pink">Mis servicios</h2>
               <div className="detail__intro">
                 <p>
                   Trabajo sola, por eso atiendo con agenda previa. Si querés un horario específico,
