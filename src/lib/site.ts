@@ -12,9 +12,14 @@ export const SITE = {
   instagram: "https://www.instagram.com/silvanapuppiotecnicaenbelleza/",
   // Tomado de la bio de Instagram. TODO: confirmar dirección exacta si quiere publicarla.
   location: "Zona Nuevocentro Shopping",
-  // De la destacada "Medios de Pago". Se omite el número de apartamento a propósito.
-  // TODO: confirmar con Silvana que quiere publicar la dirección.
-  address: "Torres Nuevocentro · Luis Alberto de Herrera 3355",
+  // Dirección confirmada por Matías (pin de Google Maps: Aureliano Rodríguez Larreta 3057, Jacinto Vera).
+  // Antes figuraba "Torres Nuevocentro · Herrera 3355", tomado de una historia de Instagram.
+  address: "Aureliano Rodríguez Larreta 3057",
+  reference: "A una cuadra del Nuevocentro Shopping",
+  // Búsqueda por dirección (no por coordenadas): Maps muestra "Aureliano Rodríguez Larreta 3057".
+  mapUrl:
+    "https://www.google.com/maps/search/?api=1&query=" +
+    encodeURIComponent("Aureliano Rodríguez Larreta 3057, Montevideo, Uruguay"),
   whatsappMessage: "Hola Silvana, quiero reservar un turno.",
 };
 
@@ -36,6 +41,12 @@ export const PAYMENTS = [
 export const whatsappLink = (message: string = SITE.whatsappMessage) =>
   `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(message)}`;
 
+// Mensaje de WhatsApp para "Quiero algo así": nombra el trabajo y suma el enlace a la foto.
+// WhatsApp no permite adjuntar imágenes desde un enlace, pero la URL de la foto se ve y se abre en el chat.
+// Funciona cuando el sitio ya está publicado en SITE.url.
+export const workMessage = (title: string, category: string, image: string) =>
+  `Hola Silvana, vi tu trabajo "${title}" (${category.toLowerCase()}) en tu web y quiero algo así.\nAcá está la foto: ${SITE.url}${image}`;
+
 // Fotos: dejar el archivo en /public/img y poner la ruta acá.
 // Mientras sea null se muestra un fondo rosa de relleno.
 export const PHOTOS = {
@@ -50,7 +61,7 @@ export const PHOTOS = {
 export const CARDS: { id: string; label: string; art?: ArtKey; photo?: string }[] = [
   { id: "manicuria", label: "Manicuría", photo: "/img/trabajos/unas-amarillo.jpg" },
   { id: "pedicuria", label: "Pedicuría", photo: "/img/servicios/pedicuria-flores.jpg" },
-  { id: "peluqueria", label: "Peluquería y balayage", photo: "/img/trabajos/balayage-capas.jpg" },
+  { id: "peluqueria", label: "Peluquería y balayage", photo: "/img/trabajos/balayage-luces.jpg" },
 ];
 
 // Imagen de cada servicio: una ilustración (`art`) o una foto real (`photo` + `pos` para el recorte).
@@ -129,6 +140,7 @@ export const SERVICES: Service[] = [
 
 // Trabajos realizados. El primero se muestra grande; los demás van en grilla.
 // Para sumar uno: copiar la foto a /public/img y agregar un objeto acá.
+// Trabajo destacado (arriba de la sección "Mis trabajos").
 export const WORKS = [
   {
     image: "/img/trabajo-cabello.jpg",
@@ -136,39 +148,86 @@ export const WORKS = [
     category: "Cabello",
     title: "Rubio luminoso con capas",
     text: "Raíz natural, luces que se funden hacia las puntas y un corte en capas que da movimiento y volumen.",
-    message: "Hola Silvana, vi el trabajo de rubio con capas y quiero consultar por algo similar.",
+  },
+];
+
+// Galería de "Mis trabajos": un mazo de cartas por categoría, con botones para cambiar entre ellas.
+// Cada foto aparece UNA sola vez en toda la sección. Fotos de las publicaciones de su Instagram.
+// TODO: confirmar con Silvana que las clientas aceptan que se muestren sus fotos (ninguna muestra el rostro).
+export type GalleryItem = { image: string; alt: string; title: string; pos?: string }; // pos: punto de enfoque al recortar
+export type GalleryCategory = {
+  id: string;
+  label: string;
+  hint: string;
+  aspect: string; // proporción de las cartas en celular (en escritorio son más anchas)
+  pos: string; // punto de enfoque por defecto (CSS object-position)
+  items: GalleryItem[];
+};
+
+export const GALLERY: GalleryCategory[] = [
+  {
+    id: "color",
+    pos: "50% 30%",
+    label: "Color",
+    hint: "Balayage, reflejos y luces",
+    aspect: "4 / 5",
+    items: [
+      { image: "/img/trabajos/balayage-ondas.jpg", alt: "Cabello largo castaño con balayage y ondas, visto de espalda", title: "Diseño de balayage" },
+      { image: "/img/trabajos/reverse-balayage.jpg", alt: "Cabello largo con reverse balayage y ondas", title: "Reverse balayage" },
+      { image: "/img/trabajos/balayage-rayitas.jpg", alt: "Cabello largo lacio con reflejos rubios, visto de espalda", title: "Reflejos rubios" },
+    ],
   },
   {
-    image: "/img/trabajos/peinado-trenzas.jpg",
-    alt: "Peinado con dos trenzas y cola, visto desde arriba",
-    category: "Peinados",
-    title: "Trenzas con cola",
-    text: "",
-    message: "Hola Silvana, vi el peinado de trenzas y quiero consultar.",
+    id: "cortes",
+    pos: "50% 28%",
+    label: "Cortes",
+    hint: "Largos, capas y rulos",
+    aspect: "4 / 5",
+    items: [
+      { image: "/img/trabajos/corte-gris.jpg", alt: "Corte corto desfilado en tono gris, visto de espalda", title: "Corte en gris" },
+      { image: "/img/trabajos/rulos.jpg", alt: "Rulos naturales definidos, vistos de espalda", title: "Rulos naturales" },
+    ],
   },
   {
-    image: "/img/trabajos/unas-corazon.jpg",
-    alt: "Uñas esmaltadas en gris y rosa con un corazón dorado",
-    category: "Uñas",
-    title: "Diseño con corazón",
-    text: "",
-    message: "Hola Silvana, vi el diseño de uñas con corazón y quiero consultar.",
+    id: "peinados",
+    pos: "50% 30%",
+    label: "Peinados",
+    hint: "Trenzas y recogidos",
+    aspect: "4 / 5",
+    items: [
+      { image: "/img/trabajos/trenza-larga.jpg", alt: "Trenza larga en cabello rubio ceniza, vista de espalda", title: "Trenza larga" },
+      { image: "/img/trabajos/media-cola.jpg", alt: "Media cola en cabello largo de tono plateado", title: "Media cola plateada" },
+      { image: "/img/trabajos/peinado-trenzas.jpg", alt: "Peinado con dos trenzas y cola, visto desde arriba", title: "Trenzas con cola" },
+      { image: "/img/trabajos/peinado-trenzado.jpg", alt: "Recogido trenzado en tono rubio, visto desde atrás", title: "Recogido trenzado" },
+    ],
   },
   {
-    image: "/img/trabajos/peinado-trenzado.jpg",
-    alt: "Recogido trenzado en tono rubio, visto desde atrás",
-    category: "Peinados",
-    title: "Recogido trenzado",
-    text: "",
-    message: "Hola Silvana, vi el recogido trenzado y quiero consultar.",
+    id: "alisado",
+    pos: "50% 28%",
+    label: "Alisado",
+    hint: "Brillo y cabello liso",
+    aspect: "4 / 5",
+    items: [
+      { image: "/img/trabajos/alisado-ombre.jpg", alt: "Cabello liso con reflejos cobrizos, visto de espalda", title: "Alisado con reflejos" },
+      { image: "/img/trabajos/alisado-rubio.jpg", alt: "Cabello rubio liso y brillante, de costado", title: "Alisado rubio" },
+    ],
   },
   {
-    image: "/img/trabajos/balayage-capas.jpg",
-    alt: "Cabello largo con balayage rubio y capas, visto de espalda",
-    category: "Cabello",
-    title: "Balayage con capas",
-    text: "",
-    message: "Hola Silvana, vi el balayage con capas y quiero consultar.",
+    id: "unas",
+    pos: "50% 50%",
+    label: "Uñas",
+    hint: "Diseños, brillos y colores",
+    aspect: "1 / 1",
+    items: [
+      { image: "/img/trabajos/unas-rojo-corazones.jpg", alt: "Uñas rojas y blancas con corazones y firma de Silvana", title: "Rojo con corazones" },
+      { image: "/img/trabajos/unas-nude-strass.jpg", alt: "Uñas nude y gris con un strass", title: "Nude con strass" },
+      { image: "/img/trabajos/unas-glitter-sq.jpg", alt: "Uñas con puntas de glitter plateado", title: "Puntas de glitter" },
+      { image: "/img/trabajos/unas-celestes.jpg", alt: "Uñas celestes con diseño de animal print y rosa", title: "Celestes con diseño" },
+      { image: "/img/trabajos/unas-aurora.jpg", alt: "Uñas con efecto aurora nacarado", title: "Efecto aurora" },
+      { image: "/img/trabajos/unas-corazon-sq.jpg", alt: "Uñas esmaltadas en gris y rosa con un corazón dorado", title: "Diseño con corazón" },
+      { image: "/img/trabajos/unas-lunares.jpg", alt: "Uñas transparentes con lunares negros", title: "Lunares negros" },
+      { image: "/img/trabajos/unas-nude-brillo.jpg", alt: "Uñas rosadas con brillo suave y firma de Silvana", title: "Rosado con brillo" },
+    ],
   },
 ];
 

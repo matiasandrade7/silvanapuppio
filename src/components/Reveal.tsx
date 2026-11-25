@@ -20,11 +20,31 @@ export default function Reveal({
     const el = ref.current;
     if (!el) return;
     setArmed(true);
-    const io = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), {
-      threshold: 0.15,
-    });
-    io.observe(el);
-    return () => io.disconnect();
+
+    // Histéresis: el elemento se mueve (translateY) al aparecer/desaparecer, y si se observara a sí
+    // mismo con un único umbral, cuando solo asoma un fragmento (por ejemplo bajo el menú fijo)
+    // el movimiento lo sacaba y metía una y otra vez ("tilteo"). Por eso:
+    //  - se muestra cuando entra al menos el 15% en la pantalla
+    //  - se oculta recién cuando sale por completo de la pantalla ampliada 140px arriba y abajo
+    // Así ninguna de las dos transiciones puede deshacer a la otra.
+    const show = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.intersectionRatio >= 0.15) setVisible(true);
+      },
+      { threshold: 0.15 },
+    );
+    const hide = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) setVisible(false);
+      },
+      { rootMargin: "140px 0px 140px 0px" },
+    );
+    show.observe(el);
+    hide.observe(el);
+    return () => {
+      show.disconnect();
+      hide.disconnect();
+    };
   }, []);
 
   return (

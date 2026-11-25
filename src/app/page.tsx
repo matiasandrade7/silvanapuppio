@@ -10,7 +10,8 @@ import ServiceArt from "@/components/ServiceArt";
 import ServicesShowcase from "@/components/ServicesShowcase";
 import Testimonials from "@/components/Testimonials";
 import Tilt from "@/components/Tilt";
-import { CARDS, HOURS, PAYMENTS, PHOTOS, SITE, WORKS, whatsappLink } from "@/lib/site";
+import WorksGallery from "@/components/WorksGallery";
+import { CARDS, HOURS, PAYMENTS, PHOTOS, SITE, WORKS, whatsappLink, workMessage } from "@/lib/site";
 
 export default function Home() {
   return (
@@ -143,33 +144,14 @@ export default function Home() {
                   <span className="work-feature__tag">{work.category}</span>
                   <h3 className="display">{work.title}</h3>
                   <p>{work.text}</p>
-                  <a href={whatsappLink(work.message)} className="btn btn--white" target="_blank" rel="noreferrer">
+                  <a href={whatsappLink(workMessage(work.title, work.category, work.image))} className="btn btn--white" target="_blank" rel="noreferrer">
                     Quiero algo así
                   </a>
                 </Reveal>
               </article>
             ))}
-
-            {WORKS.length > 1 && (
-              <ul className="work-grid">
-                {WORKS.slice(1).map((work, i) => (
-                  <li key={work.title}>
-                    <Reveal delay={i * 80}>
-                      <figure className="work-card">
-                        <div className="work-card__img">
-                          <Photo src={work.image} alt={work.alt} />
-                        </div>
-                        <figcaption>
-                          <span>{work.category}</span>
-                          {work.title}
-                        </figcaption>
-                      </figure>
-                    </Reveal>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
+          <WorksGallery />
         </section>
 
         {/* GIFT CARD */}
@@ -193,12 +175,26 @@ export default function Home() {
             <Reveal className="cta__card" delay={120}>
               <h2 className="display display--pink">¿Lista para tu momento?</h2>
               <p>
-                Trabajo sola, así que si querés un horario específico, agendá con tiempo. Escribime
-                por WhatsApp, coordinamos día y horario, y te cuento todo lo que necesites antes de
-                venir.
+                Trabajo de manera independiente y atiendo exclusivamente con agenda previa, para
+                brindarte una atención personalizada y dedicarle a cada servicio el tiempo que merece.
+              </p>
+              <p>
+                Si tenés preferencia por un día u horario específico, te recomiendo reservar tu lugar
+                con anticipación.
+              </p>
+              <p>
+                Para consultar precios y disponibilidad, escribime por WhatsApp. ¡Será un gusto
+                atenderte!
               </p>
               <p className="cta__place">
-                <PinIcon size={16} /> {SITE.address}
+                <PinIcon size={16} />
+                <span>
+                  {SITE.address}
+                  <small>{SITE.reference}</small>
+                </span>
+                <a href={SITE.mapUrl} target="_blank" rel="noreferrer">
+                  Cómo llegar
+                </a>
               </p>
               <dl className="cta__hours">
                 {HOURS.map((h) => (

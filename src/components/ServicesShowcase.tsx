@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SERVICES, whatsappLink } from "@/lib/site";
+import Lightbox from "./Lightbox";
 import ServiceArt from "./ServiceArt";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -10,6 +11,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 // que está en el centro de la pantalla; a la derecha la lista que se desplaza.
 export default function ServicesShowcase() {
   const [active, setActive] = useState(0);
+  const [viewing, setViewing] = useState<number | null>(null); // servicio abierto en el visor
   const items = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
@@ -25,24 +27,33 @@ export default function ServicesShowcase() {
     return () => io.disconnect();
   }, []);
 
+  const closeViewer = useCallback(() => setViewing(null), []);
   const go = (i: number) =>
     items.current[i]?.scrollIntoView({ behavior: "smooth", block: "center" });
 
   return (
     <div className="showcase">
-      <div className="showcase__stage" aria-hidden="true">
+      <div className="showcase__stage">
         <div className="stage__frame">
           {SERVICES.map((s, i) => (
             <div className="stage__slide" data-active={i === active} key={s.title}>
               <ServiceArt art={s.art} photo={s.photo} pos={s.pos} alt="" />
             </div>
           ))}
-          <span className="stage__num">
+          {SERVICES[active].photo && (
+            <button
+              type="button"
+              className="stage__open"
+              aria-label={`Ver foto completa: ${SERVICES[active].title}`}
+              onClick={() => setViewing(active)}
+            />
+          )}
+          <span className="stage__num" aria-hidden="true">
             {pad(active + 1)}
             <small>/{pad(SERVICES.length)}</small>
           </span>
         </div>
-        <div className="stage__dots">
+        <div className="stage__dots" aria-hidden="true">
           {SERVICES.map((s, i) => (
             <button
               key={s.title}
@@ -67,9 +78,20 @@ export default function ServicesShowcase() {
             }}
             className="svc"
           >
-            <div className="svc__art">
-              <ServiceArt art={s.art} photo={s.photo} pos={s.pos} alt={s.title} />
-            </div>
+            {s.photo ? (
+              <button
+                type="button"
+                className="svc__art svc__art--open"
+                aria-label={`Ver foto completa: ${s.title}`}
+                onClick={() => setViewing(i)}
+              >
+                <ServiceArt art={s.art} photo={s.photo} pos={s.pos} alt="" />
+              </button>
+            ) : (
+              <div className="svc__art">
+                <ServiceArt art={s.art} photo={s.photo} pos={s.pos} alt={s.title} />
+              </div>
+            )}
             <span className="svc__num">{pad(i + 1)}</span>
             <h3>{s.title}</h3>
             <p>{s.text}</p>
@@ -90,6 +112,18 @@ export default function ServicesShowcase() {
           </li>
         ))}
       </ol>
+
+      {viewing !== null && SERVICES[viewing].photo && (
+        <Lightbox
+          image={SERVICES[viewing].photo!}
+          alt={SERVICES[viewing].title}
+          title={SERVICES[viewing].title}
+          tag="Servicios"
+          ctaLabel="Consultar este servicio"
+          ctaHref={whatsappLink(`Hola Silvana, quiero consultar por ${SERVICES[viewing].title.toLowerCase()}.`)}
+          onClose={closeViewer}
+        />
+      )}
     </div>
   );
 }

@@ -533,8 +533,15 @@ ol {
   transition: rotate 400ms var(--ease-out);
 }
 
-.tilt:hover {
-  rotate: 0deg;
+/* El "hover" se mide sobre el contenedor (que no gira) y no sobre la foto: al inclinarse, la foto
+   sobresale de su caja unos píxeles, y con el mouse en esa franja se enderezaba y volvía a
+   inclinarse sin parar (temblor). */
+@media (hover: hover) {
+  .about__photo-wrap:hover .tilt,
+  .work-feature__photo-wrap:hover .tilt,
+  .cta__photo-wrap:hover .tilt {
+    rotate: 0deg;
+  }
 }
 
 .about__photo {
@@ -795,6 +802,31 @@ ol {
   object-fit: cover;
 }
 
+/* botón transparente sobre la foto del escenario: abre la foto completa */
+.stage__open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.stage__open:focus-visible {
+  outline: 3px solid var(--white);
+  outline-offset: -6px;
+}
+
+button.svc__art--open {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: zoom-in;
+}
+
 .stage__num {
   position: absolute;
   left: 22px;
@@ -985,7 +1017,7 @@ ol {
 .works__inner {
   max-width: 1180px;
   margin: 0 auto;
-  padding: clamp(72px, 9vw, 130px) var(--gutter);
+  padding: clamp(72px, 9vw, 130px) var(--gutter) 0;
 }
 
 .works__title {
@@ -1044,36 +1076,255 @@ ol {
   opacity: 0.9;
 }
 
-.work-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: clamp(14px, 2vw, 28px);
-  margin-top: clamp(56px, 7vw, 96px);
+/* Galería: pestañas por categoría + mazo de cartas */
+
+.gallery {
+  padding: clamp(56px, 7vw, 96px) var(--gutter) clamp(72px, 9vw, 130px);
 }
 
-.work-card {
+.gallery__inner {
+  display: grid;
+  max-width: 1180px;
+  margin: 0 auto;
+  justify-items: center;
+  gap: clamp(12px, 2vw, 24px);
+}
+
+.gtabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.gtab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 13px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font: 500 0.72rem/1 var(--font-body);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 250ms var(--ease-out),
+    color 250ms var(--ease-out),
+    border-color 250ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.gtab span {
+  letter-spacing: 0.1em;
+  opacity: 0.55;
+}
+
+.gtab:active {
+  transform: scale(0.97);
+}
+
+.gtab[aria-selected="true"] {
+  border-color: var(--white);
+  background: var(--white);
+  color: var(--wine);
+}
+
+@media (hover: hover) {
+  .gtab[aria-selected="false"]:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
+}
+
+@media (max-width: 560px) {
+  .gtabs {
+    gap: 8px;
+  }
+  .gtab {
+    padding: 11px 15px;
+    gap: 7px;
+    letter-spacing: 0.13em;
+  }
+}
+
+.gallery__panel {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 4px;
+  animation: gpanel 560ms var(--ease-out) both;
+}
+
+@keyframes gpanel {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* el tamaño de la carta lo define el componente (ancho y proporción), sin el tope de altura original */
+.gallery .cd-deck {
+  max-width: none;
+  max-height: none;
+}
+
+/* franja de título y flechas más ancha que la carta, para que no se corten los nombres */
+.gallery .cd-meta {
+  width: min(92vw, 520px);
+  max-width: none;
+}
+
+@media (min-width: 900px) {
+  .gallery .cd-meta {
+    width: min(var(--cd-w), 92vw);
+  }
+  .gallery .cd-card {
+    border-radius: 22px;
+  }
+}
+
+/* el carrusel usa la tipografía del sitio */
+.gallery .cd-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.gallery .cd-sub {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ff9cc0;
+}
+
+/* la carta de arriba se puede abrir: cursor de lupa (y de mano mientras se arrastra) */
+.gallery .cd-card[data-top="1"] {
+  cursor: zoom-in;
+}
+.gallery .cd-card[data-top="1"][data-drag="1"] {
+  cursor: grabbing;
+}
+
+/* Visor de foto completa */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 3vw, 40px);
+  background: rgba(30, 4, 17, 0.93);
+  backdrop-filter: blur(8px);
+  color: var(--white);
+  cursor: zoom-out;
+  animation: lb-fade 240ms var(--ease-out) both;
+}
+
+.lightbox__close {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  background: rgba(30, 4, 17, 0.5);
+  color: var(--white);
+  cursor: pointer;
+  transition:
+    background 250ms var(--ease-out),
+    color 250ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+@media (hover: hover) {
+  .lightbox__close:hover {
+    background: var(--white);
+    color: var(--wine);
+  }
+}
+
+.lightbox__close:active {
+  transform: scale(0.94);
+}
+
+.lightbox__close:focus-visible,
+.lightbox a:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 3px;
+}
+
+.lightbox__fig {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  max-width: 100%;
   margin: 0;
 }
 
-.work-card__img {
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
+.lightbox__fig img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(94vw, 1200px);
+  max-height: calc(100svh - 170px);
+  border-radius: 6px;
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.7);
+  animation: lb-img 420ms var(--ease-out) both;
 }
 
-.work-card figcaption {
-  display: grid;
-  gap: 2px;
-  padding-top: 14px;
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  line-height: 1.1;
+.lightbox__fig figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 22px;
+  cursor: default;
 }
 
-.work-card figcaption span {
-  font: 500 0.68rem/1.4 var(--font-body);
+.lightbox__tag {
+  font-size: 0.7rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #ff9cc0;
+}
+
+.lightbox__fig strong {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+@keyframes lb-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes lb-img {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox,
+  .lightbox__fig img {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery__panel {
+    animation: none;
+  }
 }
 
 @media (max-width: 860px) {
@@ -1230,11 +1481,28 @@ ol {
 }
 
 .cta__place {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 4px 10px;
   font-size: 0.85rem;
   color: var(--pink);
+}
+
+.cta__place small {
+  display: block;
+  font-size: 0.74rem;
+  opacity: 0.75;
+}
+
+.cta__place a {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .cta__hours {
